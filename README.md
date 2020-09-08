@@ -2,11 +2,11 @@
 
 ## cmd
 ```
-### Server
+Server
 1. compile Chatserver
 2. run "ChatServer <port>"
   
-### Client
+Client
 1. compile Chatserver
 2. run "ChatClient <host> <port> <name(String)>"
 ```
