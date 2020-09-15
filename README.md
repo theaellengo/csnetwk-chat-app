@@ -3,10 +3,8 @@
 ## cmd
 ```
 Server
-1. compile Chatserver
-2. run "ChatServer <port>"
+1. run runServer
   
 Client
-1. compile Chatserver
-2. run "ChatClient <host> <port> <name(String)>"
+1. run runServer
 ```
