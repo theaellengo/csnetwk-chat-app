@@ -42,8 +42,8 @@ public class ClientConnection extends Thread {
             //reads from server
             while (true) {
                 try {
-                    System.out.println(reader.readUTF());
-                    System.out.print("> "); 
+                    //name: msg
+                    System.out.println(reader.readUTF() + ": " + reader.readUTF());
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;
@@ -52,7 +52,7 @@ public class ClientConnection extends Thread {
             }
 
             writer.writeUTF("END"); //sends END to the server
-            System.out.println("You have disconnected from the chat");
+            System.out.println("You have disconnected from the chat.");
             
             //closes connections
             reader.close();

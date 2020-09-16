@@ -13,7 +13,6 @@ public class Client {
 
     public Client(){
 
-        String msg;
         String name;
         String host;
         int port;
@@ -26,10 +25,8 @@ public class Client {
             sc.nextLine(); //buffer
 
             Socket endpoint = new Socket(host, port);
-            connection = new ClientConnection(endpoint, this, name);
-            connection.start();
-            
-            System.out.print("> ");
+            connection = new ClientConnection(endpoint, this, name); //connection with client thread
+            connection.start(); //start client thead connection
             
             while (true) {
                 try {
