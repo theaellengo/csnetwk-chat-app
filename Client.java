@@ -4,49 +4,55 @@ import java.util.*;
 
 public class Client {
 
-    public static void main(String[] args) {
+    Socket endpoint;
+    DataInputStream reader;
+    DataOutputStream writer;
+    Scanner sc = new Scanner(System.in);
 
-        Scanner sc = new Scanner(System.in);
+    public static void main(String[] args){
+        new Client();
+    }
+
+    public Client(){
 
         String msg;
         String name;
         String host;
         int port;
+
+        //Ask for client details
         try {
+            System.out.print("Name: "); name = sc.nextLine();
+            System.out.print("host: "); host = sc.nextLine();
+            System.out.print("port: "); port = sc.nextInt();
+            sc.nextLine(); //buffer
 
-            System.out.print("Name: ");
-            name = sc.nextLine();
-            System.out.print("host: ");
-            host = sc.nextLine();
-            System.out.print("port: ");
-            port = sc.nextInt();
+            endpoint = new Socket(host, port);
+            reader = new DataInputStream(endpoint.getInputStream());
+            writer = new DataOutputStream(endpoint.getOutputStream());
 
-            sc.nextLine();
-
-            Socket endpoint = new Socket(host, port);
-
-            System.out.println("Client: Has connected to server " + host + ":" + port);
-
-            DataInputStream reader = new DataInputStream(endpoint.getInputStream());
-            DataOutputStream writer = new DataOutputStream(endpoint.getOutputStream());
-
+            //first write is the name
             writer.writeUTF(name);
-
+            
             System.out.print("> ");
+            //will read and write to server until client types in END
             while (!(msg = sc.nextLine()).equals("END")) {
                 writer.writeUTF(msg);
                 System.out.println(reader.readUTF());
-                System.out.print("> ");
+                System.out.print("> "); 
             }
 
-            writer.writeUTF("END");
+            //connecting to the Server
+            writer.writeUTF("END"); //sends END to the server
+            System.out.println("You have disconnected from the chat");
 
-            System.out.println("Client: has terminated connection");
-
+            //close connections
+            reader.close();
+            writer.close();
             endpoint.close();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
