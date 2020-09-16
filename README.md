@@ -1,6 +1,6 @@
 # csnetwk-chat-app
 
-## cmd
+## Navigate to folder
 ```
 Server
 1. run runServer
