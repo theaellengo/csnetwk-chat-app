@@ -17,6 +17,7 @@ public class Server {
     public Server() {
 
         int port;
+        String name;
 
         try {
             //ask server for portnum
@@ -29,19 +30,24 @@ public class Server {
             endpoint = ss.accept();
             reader = new DataInputStream(endpoint.getInputStream());
             writer = new DataOutputStream(endpoint.getOutputStream());
-            String name = reader.readUTF();
+            name = reader.readUTF();
 
             System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
 
             while (true) {
-                writer.writeUTF(name + ": " + reader.readUTF()); //echo
+                try {
+                    writer.writeUTF(name + ": " + reader.readUTF()); //echo
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break; //if not receiving messages anymore
+                }
             }
 
             //closes connections
-            //reader.close();
-            //writer.close();
-            //endpoint.close();
-            //ss.close(); 
+            reader.close();
+            writer.close();
+            endpoint.close();
+            ss.close(); 
 
         } catch (Exception e) {
             e.printStackTrace();

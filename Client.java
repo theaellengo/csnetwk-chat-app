@@ -51,8 +51,8 @@ public class Client {
             //connecting to the Server
             writer.writeUTF("END"); //sends END to the server
             System.out.println("You have disconnected from the chat");
-
-            //close connections
+            
+            //closes connections
             reader.close();
             writer.close();
             endpoint.close();
