@@ -9,6 +9,7 @@ public class Server {
     DataInputStream reader;
     DataOutputStream writer;
     Scanner sc = new Scanner(System.in);
+    ArrayList<Connection> connections = new ArrayList<Connection>();
 
     public static void main(String[] args) {
         new Server ();
@@ -17,37 +18,26 @@ public class Server {
     public Server() {
 
         int port;
-        String name;
 
         try {
             //ask server for portnum
             System.out.print("Port: ");
             port = sc.nextInt(); sc.nextLine(); //scanner for portnum + buffer
-            System.out.println("Server is now listening at port " + port);
-
-            // new server socket
             ss = new ServerSocket(port);
-            endpoint = ss.accept();
-            reader = new DataInputStream(endpoint.getInputStream());
-            writer = new DataOutputStream(endpoint.getOutputStream());
-            name = reader.readUTF();
+            System.out.println("Server running at port " + port);
 
-            System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
+            //server will continue to run
+            while(true) {
+                endpoint = ss.accept();
+                reader = new DataInputStream(endpoint.getInputStream());
+                String name = reader.readUTF();
 
-            while (true) {
-                try {
-                    writer.writeUTF(name + ": " + reader.readUTF()); //echo
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    break; //if not receiving messages anymore
-                }
+                Connection c = new Connection(endpoint, this, name);
+                c.start();
+
+                connections.add(c);
+                System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
             }
-
-            //closes connections
-            reader.close();
-            writer.close();
-            endpoint.close();
-            ss.close(); 
 
         } catch (Exception e) {
             e.printStackTrace();
