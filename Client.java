@@ -35,18 +35,30 @@ public class Client {
             writer.writeUTF(name);
             
             System.out.print("> ");
-
-            //will read and write to server until client types in END
-            while (!(msg = sc.nextLine()).equals("END")) {
-                //catch error reading writing to server
-                try {
-                    writer.writeUTF(msg);
+            try {
+                while (true) 
+                {
+                    //will read and write to server until client types in END
+                    if (!(msg = sc.nextLine()).equals("END")) {
+                    //catch error reading writing to server
+                        try {
+                            writer.writeUTF(msg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
+                
                     System.out.println(reader.readUTF());
                     System.out.print("> "); 
-                } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            
+
+            
 
             //connecting to the Server
             writer.writeUTF("END"); //sends END to the server
