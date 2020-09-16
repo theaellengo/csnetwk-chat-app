@@ -20,12 +20,16 @@ public class Connection extends Thread {
     public void sendToAll(String name, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
-            try {
-                writer.writeUTF(name);
-                writer.writeUTF(msg);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            sendToClient(name, msg);
+        }
+    }
+
+    public void sendToClient(String name, String msg) {
+        try {
+            writer.writeUTF(name);
+            writer.writeUTF(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
