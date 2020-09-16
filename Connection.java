@@ -39,13 +39,18 @@ public class Connection extends Thread {
             
             
             while (true) {
-                sendToAll(name + ": " + reader.readUTF());
+                try {
+                    sendToAll(name + ": " + reader.readUTF());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
             }
 
             //closes connections
-            //reader.close();
-            //writer.close();
-            //endpoint.close();
+            reader.close();
+            writer.close();
+            endpoint.close();
 
         } catch (Exception e) {
             e.printStackTrace();
