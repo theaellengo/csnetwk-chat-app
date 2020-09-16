@@ -34,6 +34,7 @@ public class Server {
 
                 Connection c = new Connection(endpoint, this, name);
                 c.start();
+
                 connections.add(c);
                 System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
             }
