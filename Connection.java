@@ -16,20 +16,18 @@ public class Connection extends Thread {
         this.name = name; //connection associated with identifier
     }
 
-    //sends message to all clients
-    public void sendToAll(String name, String msg) {
-        for (int i = 0; i < server.connections.size(); i++) {
-            Connection c = server.connections.get(i);
-            sendToClient(name, msg);
-        }
-    }
-
-    public void sendToClient(String name, String msg) {
+    public void sendStringToClient(String msg) {
         try {
-            writer.writeUTF(name);
             writer.writeUTF(msg);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendToAll(String msg) {
+        for (int i = 0; i < server.connections.size(); i++) {
+            Connection c = server.connections.get(i);
+            c.sendStringToClient(msg);
         }
     }
 
@@ -42,7 +40,7 @@ public class Connection extends Thread {
             
             while (true) {
                 try {
-                    sendToAll(name, reader.readUTF());
+                    sendToAll(name + ": " + reader.readUTF());
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;
