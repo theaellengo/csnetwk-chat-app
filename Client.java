@@ -1,17 +1,16 @@
-import java.io.*;
 import java.net.*;
 import java.util.*;
 
 public class Client {
 
     ClientConnection connection;
-    DataInputStream reader;
     Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args){
         new Client();
     }
 
+    //client constructor
     public Client(){
 
         String msg;
@@ -19,8 +18,8 @@ public class Client {
         String host;
         int port;
 
-        //Ask for client details
         try {
+            //Ask for client details
             System.out.print("Name: "); name = sc.nextLine();
             System.out.print("host: "); host = sc.nextLine();
             System.out.print("port: "); port = sc.nextInt();
@@ -30,6 +29,7 @@ public class Client {
             connection = new ClientConnection(endpoint, this, name);
             connection.start();
             
+            //temporary termination condition
             while (true) {
                 msg = sc.nextLine();
                 if (!(msg.equals("END"))) {
@@ -42,6 +42,7 @@ public class Client {
         }
     }
 
+    //passes message to clientconnection
     public void sendMsg(String msg) {
         try {
             connection.sendToServer(msg);

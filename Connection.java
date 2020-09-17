@@ -13,11 +13,14 @@ public class Connection extends Thread {
     public Connection(Socket endpoint, Server server, String name) {
         this.endpoint = endpoint;
         this.server = server;
-        this.name = name; //connection associated with identifier
+        this.name = name; //client associated with connection
     }
 
+    //sends string to server to connecting client
     public void sendStringToClient(String msg) {
         try {
+            writer.writeUTF(name);
+            writer.flush();
             writer.writeUTF(msg);
             writer.flush();
         } catch (Exception e) {
@@ -38,10 +41,9 @@ public class Connection extends Thread {
             reader = new DataInputStream(endpoint.getInputStream());
             writer = new DataOutputStream(endpoint.getOutputStream());
             
-            
             while (running) {
                 try {
-                    sendToAll(name + ": " + reader.readUTF());
+                    sendToAll(reader.readUTF());
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;

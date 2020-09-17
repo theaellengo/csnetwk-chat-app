@@ -4,13 +4,14 @@ import java.net.*;
 public class ClientConnection extends Thread {
     
     String name;
-    Boolean running = true;
-    Boolean clientsmessage;
+    Boolean clientsmessage = false;
     Socket endpoint;
     Client client;
     DataInputStream reader;
     DataOutputStream writer;
+    Boolean running = true; //to remove while-loop errors
     
+    //constructor
     public ClientConnection(Socket endpoint, Client client, String name) {
         this.endpoint = endpoint;
         this.client = client;
@@ -25,23 +26,25 @@ public class ClientConnection extends Thread {
 
     //sends to server
     public void sendToServer(String msg) {
-        //will write to server until client types in END
-            try {
-                writer.writeUTF(msg);
-                clientsmessage = true; //your message
-                //System.out.print("> "); 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            writer.writeUTF(msg);
+            clientsmessage = true; //client message
+        } catch (Exception e) {
+            e.printStackTrace();
+            close();
+        }
     }
 
-    public void readFromServer(String msg) {
+    public void readFromServer(String sender, String msg) {
         try {
-            if (clientsmessage) System.out.print("> ");
+            if (clientsmessage) //if the client connection is the one sending
+                System.out.print("You: ");
+            else System.out.print(sender + ": ");
             System.out.println(msg);
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
+            close();
         }
     }
 
@@ -65,11 +68,14 @@ public class ClientConnection extends Thread {
 
             //reads from server
             while (running) {
-                readFromServer(reader.readUTF());
+                String sender = reader.readUTF();
+                String message = reader.readUTF();
+                readFromServer(sender, message);
             }
 
             writer.writeUTF("END"); //sends terminatiion condition to the server
             System.out.println("You have disconnected from the chat");
+            close();
 
         } catch (Exception e) {
             e.printStackTrace();

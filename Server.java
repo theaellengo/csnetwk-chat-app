@@ -31,11 +31,11 @@ public class Server {
                 endpoint = ss.accept();
                 reader = new DataInputStream(endpoint.getInputStream());
                 writer = new DataOutputStream(endpoint.getOutputStream());
-                String name = reader.readUTF();
+                String name = reader.readUTF(); //gets client name from clientconnection
 
                 Connection c = new Connection(endpoint, this, name);
                 c.start();
-                connections.add(c);
+                connections.add(c); //adds connection to list of active connections
                 
                 System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
             }
