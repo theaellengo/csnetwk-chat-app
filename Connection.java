@@ -17,21 +17,19 @@ public class Connection extends Thread {
     }
 
     //sends string to server to connecting client
-    public void sendStringToClient(String msg) {
+    public void sendMsgToClient(String sender, String msg) {
         try {
-            writer.writeUTF(name);
-            writer.flush();
+            writer.writeUTF(sender);
             writer.writeUTF(msg);
-            writer.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void sendToAll(String msg) {
+    public void sendToAll(String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
-            c.sendStringToClient(msg);
+            c.sendMsgToClient(sender, msg);
         }
     }
 
@@ -43,7 +41,7 @@ public class Connection extends Thread {
             
             while (running) {
                 try {
-                    sendToAll(reader.readUTF());
+                    sendToAll(name, reader.readUTF());
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;

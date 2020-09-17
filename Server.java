@@ -30,7 +30,6 @@ public class Server {
             while(true) {
                 endpoint = ss.accept();
                 reader = new DataInputStream(endpoint.getInputStream());
-                writer = new DataOutputStream(endpoint.getOutputStream());
                 String name = reader.readUTF(); //gets client name from clientconnection
 
                 Connection c = new Connection(endpoint, this, name);
