@@ -1,12 +1,12 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 public class Connection extends Thread {
 
     Socket endpoint;
     Server server;
     String name;
+    Boolean running = true;
     DataInputStream reader;
     DataOutputStream writer;
 
@@ -19,6 +19,7 @@ public class Connection extends Thread {
     public void sendStringToClient(String msg) {
         try {
             writer.writeUTF(msg);
+            writer.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,7 +39,7 @@ public class Connection extends Thread {
             writer = new DataOutputStream(endpoint.getOutputStream());
             
             
-            while (true) {
+            while (running) {
                 try {
                     sendToAll(name + ": " + reader.readUTF());
                 } catch (Exception e) {
@@ -56,6 +57,4 @@ public class Connection extends Thread {
             e.printStackTrace();
         }
     }
-
-
 }

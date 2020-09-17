@@ -5,6 +5,7 @@ import java.util.*;
 public class Client {
 
     ClientConnection connection;
+    DataInputStream reader;
     Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args){
@@ -29,13 +30,10 @@ public class Client {
             connection = new ClientConnection(endpoint, this, name);
             connection.start();
             
-            System.out.print("> ");
-            
             while (true) {
-                try {
-                    connection.sendMsg(sc.nextLine());
-                } catch (Exception e) {
-                    e.printStackTrace();
+                msg = sc.nextLine();
+                if (!(msg.equals("END"))) {
+                    sendMsg(msg);
                 }
             }
             
@@ -43,4 +41,13 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    public void sendMsg(String msg) {
+        try {
+            connection.sendToServer(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
