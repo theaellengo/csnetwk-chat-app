@@ -28,16 +28,23 @@ public class Server {
 
             //server will continue to run until no connections left
             while(true) {
-                endpoint = ss.accept();
-                reader = new DataInputStream(endpoint.getInputStream());
-                String name = reader.readUTF(); //gets client name from clientconnection
+                try {
+                    endpoint = ss.accept();
+                    reader = new DataInputStream(endpoint.getInputStream());
+                    String name = reader.readUTF(); //gets client name from clientconnection
 
-                Connection c = new Connection(endpoint, this, name);
-                c.start();
-                connections.add(c); //adds connection to list of active connections
-                
-                System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
+                    Connection c = new Connection(endpoint, this, name);
+                    c.start();
+                    connections.add(c); //adds connection to list of active connections
+                    
+                    System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
             }
+            endpoint.close();
+            ss.close();
 
         } catch (Exception e) {
             e.printStackTrace();

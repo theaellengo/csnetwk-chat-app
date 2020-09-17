@@ -11,7 +11,6 @@ public class ClientConnection extends Thread {
     DataOutputStream writer;
     Boolean running = true; //to remove while-loop errors
     
-    //constructor
     public ClientConnection(Socket endpoint, Client client, String name) {
         this.endpoint = endpoint;
         this.client = client;
@@ -34,10 +33,8 @@ public class ClientConnection extends Thread {
         }
     }
 
-    public void readFromServer() {
+    public void readFromServer(String sender, String msg) {
         try {                
-            String sender = reader.readUTF();
-            String msg = reader.readUTF();
             if (clientsmessage) //if the client connection is the one sending
                 System.out.print("You: ");
             else System.out.print(sender + ": ");
@@ -56,21 +53,23 @@ public class ClientConnection extends Thread {
 
             //reads from server
             while (running) {
-                readFromServer();
+                readFromServer(reader.readUTF(), reader.readUTF());
             }
 
             writer.writeUTF("END"); //sends terminatiion condition to the server
             System.out.println("You have disconnected from the chat");
-            
-            try {
-                reader.close();
-                writer.close();
-                endpoint.close();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void close() {
+        try {
+            reader.close();
+            writer.close();
+            //endpoint.close();
+        } catch (Exception e){
             e.printStackTrace();
         }
     }

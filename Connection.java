@@ -43,10 +43,13 @@ public class Connection extends Thread {
                 try {
                     sendToAll(name, reader.readUTF());
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    break;
+                    break; //break when client ends connection
                 }
             }
+
+            System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
+            server.connections.remove(this);
+            sendToAll(name, "END");
 
             //closes connections
             reader.close();
