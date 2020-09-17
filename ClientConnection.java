@@ -5,6 +5,7 @@ public class ClientConnection extends Thread {
     
     String name;
     Boolean running = true;
+    Boolean clientsmessage;
     Socket endpoint;
     Client client;
     DataInputStream reader;
@@ -27,7 +28,8 @@ public class ClientConnection extends Thread {
         //will write to server until client types in END
             try {
                 writer.writeUTF(msg);
-                System.out.print("> "); 
+                clientsmessage = true; //your message
+                //System.out.print("> "); 
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -35,7 +37,9 @@ public class ClientConnection extends Thread {
 
     public void readFromServer(String msg) {
         try {
+            if (clientsmessage) System.out.print("> ");
             System.out.println(msg);
+            clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
