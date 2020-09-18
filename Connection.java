@@ -9,6 +9,7 @@ public class Connection extends Thread {
     String name;
     DataInputStream reader;
     DataOutputStream writer;
+    Boolean run = true;
 
     public Connection(Socket endpoint, Server server, String name) {
         this.endpoint = endpoint;
@@ -22,16 +23,15 @@ public class Connection extends Thread {
             writer.writeUTF(sender);
             writer.writeUTF(msg);
         } catch (Exception e) {
-            //e.printStackTrace();
-            //uncomment to not show up in console
-            //shows up when a client disconnects
+            System.out.println("[" + LocalTime.now() + "] Server: message sending failed");
+            server.addLogs("[" + LocalTime.now() + "] Server: message sending failed");
         }
     }
 
     public void sendToAll(String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
-            if (!endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
+            if (run && !endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
                 System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
                     " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
                 server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
@@ -65,10 +65,12 @@ public class Connection extends Thread {
                 }
             }
 
-            sendToAll("Server", name + " has left the chat.");
             System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
             server.addLogs("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
             server.connections.remove(this);
+            run = false;
+
+            sendToAll("Server", name + " has left the chat.");
 
             //closes server if no clients left
             if (server.connections.isEmpty()) {
@@ -79,8 +81,7 @@ public class Connection extends Thread {
             close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace(); //to not show in server
         }
     }
-
 }
