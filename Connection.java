@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.time.*;
 
 public class Connection extends Thread {
 
@@ -21,13 +22,21 @@ public class Connection extends Thread {
             writer.writeUTF(sender);
             writer.writeUTF(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            //uncomment to not show up in console
+            //shows up when a client disconnects
         }
     }
 
     public void sendToAll(String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
+            if (!endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
+                System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
+                server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
+            }
             c.sendMsgToClient(sender, msg);
         }
     }
@@ -56,12 +65,14 @@ public class Connection extends Thread {
                 }
             }
 
-            System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
-            server.connections.remove(this);
             sendToAll("Server", name + " has left the chat.");
+            System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
+            server.addLogs("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
+            server.connections.remove(this);
 
             //closes server if no clients left
             if (server.connections.isEmpty()) {
+                server.askToDownload();
                 server.closeserver();
             }
 
