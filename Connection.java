@@ -51,6 +51,8 @@ public class Connection extends Thread {
             server.connections.remove(this);
             sendToAll("Server", name + " has left the chat.");
 
+            if (server.connections.isEmpty()) server.closeserver();
+
             //closes connections
             reader.close();
             writer.close();

@@ -7,7 +7,6 @@ public class Server {
     ServerSocket ss;
     Socket endpoint;
     DataInputStream reader;
-    DataOutputStream writer;
     Scanner sc = new Scanner(System.in);
     ArrayList<Connection> connections = new ArrayList<Connection>();
 
@@ -38,11 +37,20 @@ public class Server {
                     connections.add(c); //adds connection to list of active connections
                     
                     System.out.println("Server: Client connected at " + endpoint.getRemoteSocketAddress());
+
                 } catch (Exception e) {
                     e.printStackTrace();
-                    break;
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeserver() {
+        try {
+            sc.close();
+            reader.close();
             endpoint.close();
             ss.close();
         } catch (Exception e) {
