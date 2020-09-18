@@ -13,7 +13,6 @@ public class Client {
 
     public Client(){
 
-        String msg;
         String host;
         int port;
 
@@ -28,19 +27,23 @@ public class Client {
             connection = new ClientConnection(endpoint, this);
             connection.start();
             
-            //temporary termination condition; exits loop if msg is "END"
-            while (true) {
-                msg = sc.nextLine();
-                if (!(msg.equals("END"))) {
-                    sendMsg(msg);
-                } else break;
-            }
+            listenForMessages();
 
             sc.close();
             connection.close();
             
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void listenForMessages () {
+        String msg;
+        while (true) {
+            msg = sc.nextLine();
+            if (!(msg.equals("END"))) {
+                sendMsg(msg);
+            } else break;
         }
     }
 

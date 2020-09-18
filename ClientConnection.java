@@ -8,7 +8,7 @@ public class ClientConnection extends Thread {
     DataInputStream reader;
     DataOutputStream writer;
     Boolean clientsmessage = false;
-    Boolean running = true;
+    Boolean run = true;
     
     public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
@@ -56,10 +56,12 @@ public class ClientConnection extends Thread {
             writer.writeUTF(client.name); //passes name to server
 
             //keeps listening for <sender, message> until connection terminated
-            while (running) { readFromServer(reader.readUTF(), reader.readUTF()); }
+            while (run) { 
+                readFromServer(reader.readUTF(), reader.readUTF()); 
+            }
 
             writer.writeUTF("END"); //sends termination condition to server
-            System.out.println("You have disconnected from the chat");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
