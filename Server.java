@@ -27,7 +27,7 @@ public class Server {
             System.out.println("Server running at port " + port);
 
             //server will continue to run until no connections left
-            while(true) {
+            while (true) {
                 try {
                     endpoint = ss.accept();
                     reader = new DataInputStream(endpoint.getInputStream());
@@ -45,7 +45,6 @@ public class Server {
             }
             endpoint.close();
             ss.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

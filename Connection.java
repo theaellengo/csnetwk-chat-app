@@ -49,7 +49,7 @@ public class Connection extends Thread {
 
             System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");
             server.connections.remove(this);
-            sendToAll(name, "END");
+            sendToAll("Server", name + " has left the chat.");
 
             //closes connections
             reader.close();

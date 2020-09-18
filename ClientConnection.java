@@ -3,18 +3,16 @@ import java.net.*;
 
 public class ClientConnection extends Thread {
     
-    String name;
-    Boolean clientsmessage = false;
     Socket endpoint;
     Client client;
     DataInputStream reader;
     DataOutputStream writer;
-    Boolean running = true; //to remove while-loop errors
+    Boolean clientsmessage = false;
+    Boolean running = true;
     
-    public ClientConnection(Socket endpoint, Client client, String name) {
+    public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
         this.client = client;
-        this.name = name;
         try {
             reader = new DataInputStream(endpoint.getInputStream());
             writer = new DataOutputStream(endpoint.getOutputStream());
@@ -49,7 +47,7 @@ public class ClientConnection extends Thread {
     public void run() {
         try {
             //first write is the name
-            writer.writeUTF(name);
+            writer.writeUTF(client.name);
 
             //reads from server
             while (running) {
@@ -68,7 +66,7 @@ public class ClientConnection extends Thread {
         try {
             reader.close();
             writer.close();
-            //endpoint.close();
+            endpoint.close();
         } catch (Exception e){
             e.printStackTrace();
         }

@@ -5,6 +5,7 @@ public class Client {
 
     ClientConnection connection;
     Scanner sc = new Scanner(System.in);
+    String name;
 
     public static void main(String[] args){
         new Client();
@@ -14,7 +15,6 @@ public class Client {
     public Client(){
 
         String msg;
-        String name;
         String host;
         int port;
 
@@ -25,7 +25,7 @@ public class Client {
             System.out.print("port: "); port = sc.nextInt(); sc.nextLine(); //buffer
 
             Socket endpoint = new Socket(host, port);
-            connection = new ClientConnection(endpoint, this, name);
+            connection = new ClientConnection(endpoint, this);
             connection.start();
             
             //temporary termination condition; exits loop if msg is "END"
@@ -36,7 +36,6 @@ public class Client {
                 } else break;
             }
 
-            System.out.println("Successful Break.");
             connection.close();
             
         } catch (Exception e) {
