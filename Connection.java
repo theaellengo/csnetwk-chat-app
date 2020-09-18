@@ -6,7 +6,6 @@ public class Connection extends Thread {
     Socket endpoint;
     Server server;
     String name;
-    Boolean running = true;
     DataInputStream reader;
     DataOutputStream writer;
 
@@ -16,7 +15,7 @@ public class Connection extends Thread {
         this.name = name; //client associated with connection
     }
 
-    //sends string to server to connecting client
+    //sends string to server to client i
     public void sendMsgToClient(String sender, String msg) {
         try {
             writer.writeUTF(sender);
@@ -33,17 +32,27 @@ public class Connection extends Thread {
         }
     }
 
+    public void close() {
+        try {
+            reader.close();
+            writer.close();
+            endpoint.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         try {
             reader = new DataInputStream(endpoint.getInputStream());
             writer = new DataOutputStream(endpoint.getOutputStream());
             
-            while (running) {
+            while (true) {
                 try {
                     sendToAll(name, reader.readUTF());
                 } catch (Exception e) {
-                    break; //break when client ends connection
+                    break;
                 }
             }
 
@@ -51,15 +60,16 @@ public class Connection extends Thread {
             server.connections.remove(this);
             sendToAll("Server", name + " has left the chat.");
 
-            if (server.connections.isEmpty()) server.closeserver();
+            //closes server if no clients left
+            if (server.connections.isEmpty()) {
+                server.closeserver();
+            }
 
-            //closes connections
-            reader.close();
-            writer.close();
-            endpoint.close();
+            close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

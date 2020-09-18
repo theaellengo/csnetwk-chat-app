@@ -13,18 +13,11 @@ public class ClientConnection extends Thread {
     public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
         this.client = client;
-        try {
-            reader = new DataInputStream(endpoint.getInputStream());
-            writer = new DataOutputStream(endpoint.getOutputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    //sends to server
     public void sendToServer(String msg) {
         try {
-            clientsmessage = true; //client message
+            clientsmessage = true; //this.client message to server
             writer.writeUTF(msg);
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,30 +26,13 @@ public class ClientConnection extends Thread {
 
     public void readFromServer(String sender, String msg) {
         try {                
-            if (clientsmessage) //if the client connection is the one sending
+            if (clientsmessage) {
                 System.out.print("You: ");
-            else System.out.print(sender + ": ");
-            System.out.println(msg);
-            clientsmessage = false;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            //first write is the name
-            writer.writeUTF(client.name);
-
-            //reads from server
-            while (running) {
-                readFromServer(reader.readUTF(), reader.readUTF());
+            } else {
+                System.out.print(sender + ": ");
             }
-
-            writer.writeUTF("END"); //sends terminatiion condition to the server
-            System.out.println("You have disconnected from the chat");
-
+            System.out.println(msg);
+            clientsmessage = false; //set false after message has been received
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,6 +44,23 @@ public class ClientConnection extends Thread {
             writer.close();
             endpoint.close();
         } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            reader = new DataInputStream(endpoint.getInputStream());
+            writer = new DataOutputStream(endpoint.getOutputStream());
+            writer.writeUTF(client.name); //passes name to server
+
+            //keeps listening for <sender, message> until connection terminated
+            while (running) { readFromServer(reader.readUTF(), reader.readUTF()); }
+
+            writer.writeUTF("END"); //sends termination condition to server
+            System.out.println("You have disconnected from the chat");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
