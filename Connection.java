@@ -7,6 +7,7 @@ public class Connection extends Thread {
     Socket endpoint;
     Server server;
     String name;
+    String type;
     DataInputStream reader;
     DataOutputStream writer;
     Boolean run = true;
@@ -20,22 +21,12 @@ public class Connection extends Thread {
     //sends string to server to client i
     public void sendMsgToClient(String sender, String msg) {
         try {
+            writer.writeUTF(this.type);
             writer.writeUTF(sender);
             writer.writeUTF(msg);
         } catch (Exception e) {
             System.out.println("[" + LocalTime.now() + "] Server: message sending failed");
             server.addLogs("[" + LocalTime.now() + "] Server: message sending failed");
-        }
-    }
-
-    public void sendFileToClient(String sender, int allocsize, byte[] bytes) {
-        try {
-            writer.writeUTF(sender);
-            writer.writeInt(allocsize);
-            writer.write(bytes);
-        } catch (Exception e) {
-            System.out.println("Send File to clients nono");
-            e.printStackTrace();
         }
     }
 
@@ -52,16 +43,17 @@ public class Connection extends Thread {
         }
     }
 
-    public void sendFileToAll(String sender, int allocsize, byte[] bytes) {
-        for (int i = 0; i < server.connections.size(); i++) {
-            Connection c = server.connections.get(i);
-            if (run && !endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
-                System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
-                server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
-            }
-            c.sendFileToClient(sender, allocsize, bytes);
+    public void sendFileToClient(String name) {
+        try {
+            int bytesize = reader.readInt();
+            byte[] allocbytes = new byte[bytesize];
+            reader.read(allocbytes, 0, allocbytes.length);
+            writer.writeUTF(this.type);
+            writer.writeUTF(name);
+            writer.writeInt(bytesize);
+            writer.write(allocbytes, 0, allocbytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -82,24 +74,16 @@ public class Connection extends Thread {
             writer = new DataOutputStream(endpoint.getOutputStream());
             
             while (true) {
+                this.type = reader.readUTF();
                 try {
-                    sendToAll(name, reader.readUTF());
+                    if (type.equals("msg")) {
+                        sendToAll(name, reader.readUTF());
+                    } else {
+                        sendFileToClient(name);
+                    }  
                 } catch (Exception e) {
                     break;
-                } finally {
-                    byte[] allocbytes = new byte[reader.readInt()];
-                    reader.read(allocbytes, 0, allocbytes.length);
-                    try {
-                        File filename = new File("RCVD.MD");
-                        FileOutputStream fileOutput = new FileOutputStream(filename);
-                        fileOutput.write(allocbytes, 0, allocbytes.length);
-
-                        fileOutput.close();
-                    } catch (Exception e) {
-                        System.out.println("DID NOT RECIEVE FILE AT CONNECTION");
-                        e.printStackTrace();
-                    }
-                }
+                } 
             }
 
             System.out.println("Server: Client at " + endpoint.getRemoteSocketAddress() + " has disconnected.");

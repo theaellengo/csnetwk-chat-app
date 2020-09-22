@@ -8,6 +8,7 @@ public class ClientConnection extends Thread {
     DataInputStream reader;
     DataOutputStream writer;
     Boolean clientsmessage = false;
+    Boolean typefile = false;
     Boolean run = true;
     
     public ClientConnection(Socket endpoint, Client client) {
@@ -17,6 +18,7 @@ public class ClientConnection extends Thread {
 
     public void sendToServer(String msg) {
         try {
+            writer.writeUTF("msg");
             clientsmessage = true; //this.client message to server
             writer.writeUTF(msg);
         } catch (Exception e) {
@@ -26,6 +28,8 @@ public class ClientConnection extends Thread {
 
     public void sendFileToServer(int bytecount, DataInputStream dataInput) {
         try {
+            writer.writeUTF("file");
+            clientsmessage = false;
             byte[] allocbytes = new byte[bytecount];
             writer.writeInt(bytecount);
             dataInput.read(allocbytes, 0, allocbytes.length);
@@ -50,6 +54,26 @@ public class ClientConnection extends Thread {
         }
     }
 
+    public void readFileFromServer(){
+        try {
+            String sender = reader.readUTF();
+            int bytesize = reader.readInt();
+            byte[] allocbytes = new byte[bytesize];
+            reader.read(allocbytes, 0, allocbytes.length);
+            try {
+                File filename = new File("RCVD.MD");
+                FileOutputStream fileOutput = new FileOutputStream(filename);
+                fileOutput.write(allocbytes, 0, allocbytes.length);
+                fileOutput.close();
+            } catch (Exception e) {
+                System.out.println("DID NOT RECIEVE FILE AT CLIENTSIDE");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void close() {
         try {
             reader.close();
@@ -69,7 +93,16 @@ public class ClientConnection extends Thread {
 
             //keeps listening for <sender, message> until connection terminated
             while (run) { 
-                readFromServer(reader.readUTF(), reader.readUTF()); 
+                try {
+                    String type = reader.readUTF();
+                    if (type.equals("file")) {
+                        readFileFromServer();
+                    } else {
+                        readFromServer(reader.readUTF(), reader.readUTF()); 
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             writer.writeUTF("END"); //sends termination condition to server
