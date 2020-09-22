@@ -8,7 +8,6 @@ public class ClientConnection extends Thread {
     DataInputStream reader;
     DataOutputStream writer;
     Boolean clientsmessage = false;
-    Boolean typefile = false;
     Boolean run = true;
     
     public ClientConnection(Socket endpoint, Client client) {
@@ -36,7 +35,6 @@ public class ClientConnection extends Thread {
             writer.write(allocbytes, 0, allocbytes.length);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("DID NOT SEND FILE TO SERVER");
         }
     }
 
@@ -66,9 +64,14 @@ public class ClientConnection extends Thread {
                 fileOutput.write(allocbytes, 0, allocbytes.length);
                 fileOutput.close();
             } catch (Exception e) {
-                System.out.println("DID NOT RECIEVE FILE AT CLIENTSIDE");
                 e.printStackTrace();
             }
+            if (clientsmessage) {
+                System.out.print("You: ");
+            } else {
+                System.out.print(sender + ": ");
+            }
+            System.out.println("sent a file");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,6 +105,7 @@ public class ClientConnection extends Thread {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    break;
                 }
             }
 

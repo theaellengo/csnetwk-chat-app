@@ -52,8 +52,13 @@ public class Connection extends Thread {
             writer.writeUTF(name);
             writer.writeInt(bytesize);
             writer.write(allocbytes, 0, allocbytes.length);
+            System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a file");
+            server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+            " sent a file");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("[" + LocalTime.now() + "] Server: file sending failed");
+            server.addLogs("[" + LocalTime.now() + "] Server: file sending failed");
         }
     }
 
@@ -91,6 +96,7 @@ public class Connection extends Thread {
             server.connections.remove(this);
             run = false;
 
+            this.type = "msg";
             sendToAll("Server", name + " has left the chat.");
 
             //closes server if no clients left
