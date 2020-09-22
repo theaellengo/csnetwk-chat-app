@@ -28,6 +28,17 @@ public class Connection extends Thread {
         }
     }
 
+    public void sendFileToClient(String sender, int allocsize, byte[] bytes) {
+        try {
+            writer.writeUTF(sender);
+            writer.writeInt(allocsize);
+            writer.write(bytes);
+        } catch (Exception e) {
+            System.out.println("Send File to clients nono");
+            e.printStackTrace();
+        }
+    }
+
     public void sendToAll(String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
@@ -38,6 +49,19 @@ public class Connection extends Thread {
                     " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
             }
             c.sendMsgToClient(sender, msg);
+        }
+    }
+
+    public void sendFileToAll(String sender, int allocsize, byte[] bytes) {
+        for (int i = 0; i < server.connections.size(); i++) {
+            Connection c = server.connections.get(i);
+            if (run && !endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
+                System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
+                server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
+            }
+            c.sendFileToClient(sender, allocsize, bytes);
         }
     }
 
@@ -62,6 +86,8 @@ public class Connection extends Thread {
                     sendToAll(name, reader.readUTF());
                 } catch (Exception e) {
                     break;
+                } finally {
+                    //sendFileToAll(name);
                 }
             }
 

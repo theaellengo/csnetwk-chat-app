@@ -24,6 +24,22 @@ public class ClientConnection extends Thread {
         }
     }
 
+    public void sendFileToServer(int bytecount, DataInputStream dataInput) {
+        try {
+            byte[] allocbytes = new byte[bytecount];
+            dataInput.read(allocbytes, 0, allocbytes.length);
+
+            File filename = new File("RCVD.MD");
+            FileOutputStream fileOutput = new FileOutputStream(filename);
+            fileOutput.write(allocbytes, 0, allocbytes.length);
+
+            fileOutput.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("DID NOT SEND FILE TO SERVER");
+        }
+    }
+
     public void readFromServer(String sender, String msg) {
         try {                
             if (clientsmessage) {
