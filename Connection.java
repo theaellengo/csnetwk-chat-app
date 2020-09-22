@@ -87,7 +87,18 @@ public class Connection extends Thread {
                 } catch (Exception e) {
                     break;
                 } finally {
-                    //sendFileToAll(name);
+                    byte[] allocbytes = new byte[reader.readInt()];
+                    reader.read(allocbytes, 0, allocbytes.length);
+                    try {
+                        File filename = new File("RCVD.MD");
+                        FileOutputStream fileOutput = new FileOutputStream(filename);
+                        fileOutput.write(allocbytes, 0, allocbytes.length);
+
+                        fileOutput.close();
+                    } catch (Exception e) {
+                        System.out.println("DID NOT RECIEVE FILE AT CONNECTION");
+                        e.printStackTrace();
+                    }
                 }
             }
 
