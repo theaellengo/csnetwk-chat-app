@@ -29,7 +29,8 @@ public class Client {
             connection.start();
             
             listenForMessages();
-
+            
+            connection.terminateConnection();
             sc.close();
             connection.close();
             
@@ -76,7 +77,6 @@ public class Client {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("DID NOT SEND FILE TO CLIENT CONNECTION");
         }
         
     }

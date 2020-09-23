@@ -7,6 +7,7 @@ public class ClientConnection extends Thread {
     Client client;
     DataInputStream reader;
     DataOutputStream writer;
+    String type = "msg";
     Boolean clientsmessage = false;
     Boolean run = true;
     
@@ -17,7 +18,8 @@ public class ClientConnection extends Thread {
 
     public void sendToServer(String msg) {
         try {
-            writer.writeUTF("msg");
+            type = "msg";
+            writer.writeUTF(type);
             clientsmessage = true; //this.client message to server
             writer.writeUTF(msg);
         } catch (Exception e) {
@@ -27,8 +29,9 @@ public class ClientConnection extends Thread {
 
     public void sendFileToServer(int bytecount, DataInputStream dataInput) {
         try {
-            writer.writeUTF("file");
-            clientsmessage = false;
+            type = "file";
+            writer.writeUTF(type);
+            clientsmessage = true;
             byte[] allocbytes = new byte[bytecount];
             writer.writeInt(bytecount);
             dataInput.read(allocbytes, 0, allocbytes.length);
@@ -52,9 +55,8 @@ public class ClientConnection extends Thread {
         }
     }
 
-    public void readFileFromServer(){
+    public void readFileFromServer(String sender){
         try {
-            String sender = reader.readUTF();
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
@@ -72,6 +74,7 @@ public class ClientConnection extends Thread {
                 System.out.print(sender + ": ");
             }
             System.out.println("sent a file");
+            clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,6 +90,10 @@ public class ClientConnection extends Thread {
         }
     }
 
+    public void terminateConnection() {
+        this.run = false;
+    }
+
     @Override
     public void run() {
         try {
@@ -95,21 +102,22 @@ public class ClientConnection extends Thread {
             writer.writeUTF(client.name); //passes name to server
 
             //keeps listening for <sender, message> until connection terminated
-            while (run) { 
+            while (true) { 
                 try {
-                    String type = reader.readUTF();
+                    type = reader.readUTF(); //this comes from client, which is closed
                     if (type.equals("file")) {
-                        readFileFromServer();
+                        readFileFromServer(reader.readUTF());
                     } else {
                         readFromServer(reader.readUTF(), reader.readUTF()); 
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    break;
                 }
+                if (!run) break;
             }
 
-            writer.writeUTF("END"); //sends termination condition to server
+            //writer.writeUTF("msg");
+            //writer.writeUTF("END");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,0 +1,12 @@
+Server: Client connected at /127.0.0.1:52598
+Server: Client connected at /127.0.0.1:52599
+[23:04:14.812437600] Client /127.0.0.1:52599 sent a message to /127.0.0.1:52598
+[23:04:18.010597700] Client /127.0.0.1:52598 sent a message to /127.0.0.1:52599
+[23:04:25.001585900] Client /127.0.0.1:52598 sent a file
+[23:04:31.127141400] Client /127.0.0.1:52598 sent a message to /127.0.0.1:52599
+[23:04:37.633187700] Client /127.0.0.1:52599 sent a message to /127.0.0.1:52598
+[23:04:40.826359200] Client /127.0.0.1:52599 sent a message to /127.0.0.1:52598
+[23:04:43.587791400] Client /127.0.0.1:52599 sent a message to /127.0.0.1:52598
+Server: Client at /127.0.0.1:52599 has disconnected.
+Server: Client at /127.0.0.1:52598 has disconnected.
+

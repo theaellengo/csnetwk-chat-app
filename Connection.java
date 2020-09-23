@@ -19,9 +19,9 @@ public class Connection extends Thread {
     }
 
     //sends string to server to client i
-    public void sendMsgToClient(String sender, String msg) {
+    public void sendMsgToClient(String type, String sender, String msg) {
         try {
-            writer.writeUTF(this.type);
+            writer.writeUTF(type);
             writer.writeUTF(sender);
             writer.writeUTF(msg);
         } catch (Exception e) {
@@ -30,7 +30,7 @@ public class Connection extends Thread {
         }
     }
 
-    public void sendToAll(String sender, String msg) {
+    public void sendToAll(String type, String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
             if (run && !endpoint.getRemoteSocketAddress().equals(server.connections.get(i).endpoint.getRemoteSocketAddress())) {
@@ -39,16 +39,16 @@ public class Connection extends Thread {
                 server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
                     " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
             }
-            c.sendMsgToClient(sender, msg);
+            c.sendMsgToClient(type, sender, msg);
         }
     }
 
-    public void sendFileToClient(String name) {
+    public void sendFileToClient(String type, String name) {
         try {
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
-            writer.writeUTF(this.type);
+            writer.writeUTF(type);
             writer.writeUTF(name);
             writer.writeInt(bytesize);
             writer.write(allocbytes, 0, allocbytes.length);
@@ -79,14 +79,15 @@ public class Connection extends Thread {
             writer = new DataOutputStream(endpoint.getOutputStream());
             
             while (true) {
-                this.type = reader.readUTF();
                 try {
+                    type = reader.readUTF();
                     if (type.equals("msg")) {
-                        sendToAll(name, reader.readUTF());
+                        sendToAll(type, name, reader.readUTF());
                     } else {
-                        sendFileToClient(name);
+                        sendFileToClient(type, name);
                     }  
                 } catch (Exception e) {
+                    //e.printStackTrace();
                     break;
                 } 
             }
@@ -96,8 +97,7 @@ public class Connection extends Thread {
             server.connections.remove(this);
             run = false;
 
-            this.type = "msg";
-            sendToAll("Server", name + " has left the chat.");
+            sendToAll("msg", "Server", name + " has left the chat.");
 
             //closes server if no clients left
             if (server.connections.isEmpty()) {
