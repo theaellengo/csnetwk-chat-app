@@ -57,23 +57,23 @@ public class ClientConnection extends Thread {
 
     public void readFileFromServer(String sender){
         try {
-            int bytesize = reader.readInt();
-            byte[] allocbytes = new byte[bytesize];
-            reader.read(allocbytes, 0, allocbytes.length);
-            try {
-                File filename = new File("RCVD.MD");
-                FileOutputStream fileOutput = new FileOutputStream(filename);
-                fileOutput.write(allocbytes, 0, allocbytes.length);
-                fileOutput.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             if (clientsmessage) {
                 System.out.print("You: ");
             } else {
                 System.out.print(sender + ": ");
             }
             System.out.println("sent a file");
+            int bytesize = reader.readInt();
+            byte[] allocbytes = new byte[bytesize];
+            reader.read(allocbytes, 0, allocbytes.length);
+            try {
+                File filename = new File("RCVD.MD"); //have to change
+                FileOutputStream fileOutput = new FileOutputStream(filename);
+                fileOutput.write(allocbytes, 0, allocbytes.length);
+                fileOutput.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +102,7 @@ public class ClientConnection extends Thread {
             writer.writeUTF(client.name); //passes name to server
 
             //keeps listening for <sender, message> until connection terminated
-            while (true) { 
+            while (run) { 
                 try {
                     type = reader.readUTF(); //this comes from client, which is closed
                     if (type.equals("file")) {
@@ -112,8 +112,8 @@ public class ClientConnection extends Thread {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    break;
                 }
-                if (!run) break;
             }
 
             //writer.writeUTF("msg");
