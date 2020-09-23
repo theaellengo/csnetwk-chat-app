@@ -56,6 +56,7 @@ public class Connection extends Thread {
         }
     }
 
+    //can only support one other client, which is fine
     public void sendFileToOtherClient(String type, String name) {
         try {
             int bytesize = reader.readInt();
@@ -65,9 +66,9 @@ public class Connection extends Thread {
                 Connection c = server.connections.get(i);
                 if (run && !c.equals(this)) {
                     System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file");
+                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
                     server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file");
+                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
                     c.sendFileToClient(type, name, bytesize);
                 }
             }
@@ -122,7 +123,7 @@ public class Connection extends Thread {
             close();
 
         } catch (Exception e) {
-            //e.printStackTrace(); //to not show in server
+            //e.printStackTrace();
         }
     }
 }

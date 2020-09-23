@@ -116,9 +116,6 @@ public class ClientConnection extends Thread {
                 }
             }
 
-            //writer.writeUTF("msg");
-            //writer.writeUTF("END");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
