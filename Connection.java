@@ -10,12 +10,15 @@ public class Connection extends Thread {
     String type;
     DataInputStream reader;
     DataOutputStream writer;
-    Boolean run = true;
+    Boolean run;
+    Boolean log;
 
     public Connection(Socket endpoint, Server server, String name) {
         this.endpoint = endpoint;
         this.server = server;
         this.name = name; //client associated with connection
+        this.run = true;
+        this.log = false;
     }
 
     //sends string to server to client i
@@ -35,7 +38,7 @@ public class Connection extends Thread {
             Connection c = server.connections.get(i);
             c.sendMsgToClient(type, sender, msg);
 
-            if (run && !c.equals(this)) {
+            if (run && !c.equals(this) && log) {
                 String log1 = "[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
                 " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress();
                 System.out.println(log1);
@@ -49,19 +52,6 @@ public class Connection extends Thread {
         }
     }
 
-    public void sendFileToClient(String type, String name, int bytesize) {
-        try {
-            byte[] allocbytes = new byte[bytesize];
-            writer.writeUTF(type);
-            writer.writeUTF(name);
-            writer.writeInt(bytesize);
-            writer.write(allocbytes, 0, allocbytes.length);
-        } catch (Exception e) {
-            System.out.println("[" + LocalTime.now() + "] Server: file sending failed");
-            server.addLogs("[" + LocalTime.now() + "] Server: file sending failed");
-        }
-    }
-
     //can only support one other client, which is fine
     public void sendFileToOtherClient(String type, String name) {
         try {
@@ -72,7 +62,10 @@ public class Connection extends Thread {
                 Connection c = server.connections.get(i);
                 if (run && !c.equals(this)) {
 
-                    c.sendFileToClient(type, name, bytesize);
+                    c.writer.writeUTF(type);
+                    c.writer.writeUTF(name);
+                    c.writer.writeInt(bytesize);
+                    c.writer.write(allocbytes, 0, allocbytes.length);
 
                     String log1 = "[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
                     " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress();
@@ -82,10 +75,16 @@ public class Connection extends Thread {
                     " received a file from " + endpoint.getRemoteSocketAddress();
                     System.out.println(log2);
                     server.addLogs(log2);
+                } else {
+                    this.log = false;
+                    sendMsgToClient("msg", name, " sent a file");
+                    this.log = true;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("[" + LocalTime.now() + "] Server: file sending failed");
+            server.addLogs("[" + LocalTime.now() + "] Server: file sending failed");
         }
     }
 
@@ -106,6 +105,7 @@ public class Connection extends Thread {
             writer = new DataOutputStream(endpoint.getOutputStream());
 
             sendToAll("msg", "Server", this.name + " has entered the chat.");
+            this.log = true;
             
             while (true) {
                 try {

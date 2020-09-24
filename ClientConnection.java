@@ -57,12 +57,6 @@ public class ClientConnection extends Thread {
 
     public void readFileFromServer(String sender){
         try {
-            if (clientsmessage) {
-                System.out.print("You: ");
-            } else {
-                System.out.print(sender + ": ");
-            }
-            System.out.println("sent a file");
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
@@ -74,6 +68,12 @@ public class ClientConnection extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (clientsmessage) {
+                System.out.print("You: ");
+            } else {
+                System.out.print(sender + ": ");
+            }
+            System.out.println("sent a file");
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,7 +111,6 @@ public class ClientConnection extends Thread {
                         readFromServer(reader.readUTF(), reader.readUTF()); 
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     break;
                 }
             }

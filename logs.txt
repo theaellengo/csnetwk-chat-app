@@ -1,9 +1,9 @@
-Server: Client connected at /127.0.0.1:54046
-Server: Client connected at /127.0.0.1:54047
-[00:52:08.959720] Client /127.0.0.1:54047 sent a message to /127.0.0.1:54046
-[00:52:17.612798100] Client /127.0.0.1:54046 sent a file to /127.0.0.1:54047
-[00:52:22.869058600] Client /127.0.0.1:54047 sent a message to /127.0.0.1:54046
-[00:52:28.310508700] Client /127.0.0.1:54046 sent a message to /127.0.0.1:54047
-Server: Client at /127.0.0.1:54046 has disconnected.
-Server: Client at /127.0.0.1:54047 has disconnected.
+Server: Client connected at /127.0.0.1:61804
+Server: Client connected at /127.0.0.1:61805
+[15:39:10.579864500] Client /127.0.0.1:61805 sent a message to /127.0.0.1:61804
+[15:39:10.603800500] Client /127.0.0.1:61804 received a message from /127.0.0.1:61805
+[15:39:12.466765100] Client /127.0.0.1:61805 sent a message to /127.0.0.1:61804
+[15:39:12.466765100] Client /127.0.0.1:61804 received a message from /127.0.0.1:61805
+Server: Client at /127.0.0.1:61805 has disconnected.
+Server: Client at /127.0.0.1:61804 has disconnected.
 
