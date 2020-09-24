@@ -33,13 +33,19 @@ public class Connection extends Thread {
     public void sendToAll(String type, String sender, String msg) {
         for (int i = 0; i < server.connections.size(); i++) {
             Connection c = server.connections.get(i);
-            if (run && !c.equals(this)) {
-                System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
-                server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
-            }
             c.sendMsgToClient(type, sender, msg);
+
+            if (run && !c.equals(this)) {
+                String log1 = "[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                " sent a message to " + server.connections.get(i).endpoint.getRemoteSocketAddress();
+                System.out.println(log1);
+                server.addLogs(log1);
+                String log2 = "[" + LocalTime.now() + "] Client " + server.connections.get(i).endpoint.getRemoteSocketAddress() + 
+                " received a message from " + endpoint.getRemoteSocketAddress();
+                System.out.println(log2);
+                server.addLogs(log2);
+            }
+
         }
     }
 
@@ -65,11 +71,17 @@ public class Connection extends Thread {
             for (int i = 0; i < server.connections.size(); i++) {
                 Connection c = server.connections.get(i);
                 if (run && !c.equals(this)) {
-                    System.out.println("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
-                    server.addLogs("[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
-                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress());
+
                     c.sendFileToClient(type, name, bytesize);
+
+                    String log1 = "[" + LocalTime.now() + "] Client " + endpoint.getRemoteSocketAddress() + 
+                    " sent a file to " + server.connections.get(i).endpoint.getRemoteSocketAddress();
+                    System.out.println(log1);
+                    server.addLogs(log1);
+                    String log2 = "[" + LocalTime.now() + "] Client " + server.connections.get(i).endpoint.getRemoteSocketAddress() + 
+                    " received a file from " + endpoint.getRemoteSocketAddress();
+                    System.out.println(log2);
+                    server.addLogs(log2);
                 }
             }
         } catch (Exception e) {
@@ -92,6 +104,8 @@ public class Connection extends Thread {
         try {
             reader = new DataInputStream(endpoint.getInputStream());
             writer = new DataOutputStream(endpoint.getOutputStream());
+
+            sendToAll("msg", "Server", this.name + " has entered the chat.");
             
             while (true) {
                 try {
@@ -112,7 +126,7 @@ public class Connection extends Thread {
             server.connections.remove(this);
             run = false;
 
-            sendToAll("msg", "Server", name + " has left the chat.");
+            sendToAll("msg", "Server", this.name + " has left the chat.");
 
             //closes server if no clients left
             if (server.connections.isEmpty()) {
