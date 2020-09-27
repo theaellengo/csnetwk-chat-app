@@ -55,8 +55,11 @@ public class ClientConnection extends Thread {
             writer.writeUTF(type);
             clientsmessage = true;
 
-            System.out.println(filename);
-            this.filename = filename.toString();
+            System.out.println("FILE: " + filename);
+            String temp = filename.toString();
+            setFilename(temp);
+
+            System.out.println("FILE (toString): " + this.filename);
 
             FileInputStream fileInput = new FileInputStream(filename);
             reader = new DataInputStream(fileInput);
@@ -136,8 +139,13 @@ public class ClientConnection extends Thread {
         this.run = false;
     }
 
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
     public String getFilename() {
-        return JOptionPane.showInputDialog(frame, "Rename file: " + this.filename, "",
+        String message = "Rename file: " + this.filename;
+        return JOptionPane.showInputDialog(frame, message, "",
                 JOptionPane.PLAIN_MESSAGE);
     }
 
