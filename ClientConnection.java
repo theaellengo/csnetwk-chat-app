@@ -41,18 +41,22 @@ public class ClientConnection extends Thread {
         }
     }
 
-    public void readFromServer(String sender, String msg) {
-        try {                
+    public String readFromServer(String sender, String msg) {
+        String message = "";
+        try {
             if (clientsmessage) {
-                System.out.print("You: ");
+                message = "You: " + msg + "\n\n";
+                System.out.println(message);
             } else {
-                System.out.print(sender + ": ");
+                message = sender + ": " + msg + "\n\n";
+                System.out.println(message);
             }
-            System.out.println(msg);
+//            System.out.println(msg);
             clientsmessage = false; //set false after message has been received
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return message;
     }
 
     public void readFileFromServer(String sender){
@@ -108,7 +112,8 @@ public class ClientConnection extends Thread {
                     if (type.equals("file")) {
                         readFileFromServer(reader.readUTF());
                     } else {
-                        readFromServer(reader.readUTF(), reader.readUTF()); 
+//                        readFromServer(reader.readUTF(), reader.readUTF());
+                        client.messageArea.append(readFromServer(reader.readUTF(), reader.readUTF()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

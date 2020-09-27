@@ -1,56 +1,105 @@
-import java.net.*;
-import java.util.*;
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
+import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
 
+    /* BACK-END components **/
     ClientConnection connection;
     Scanner sc = new Scanner(System.in);
     String name;
+    String host;
+    int port;
 
-    public static void main(String[] args){
-        new Client();
+    // main chat area
+    JFrame frame = new JFrame("De La Salle Usap");
+    JPanel panel = new JPanel();
+    JTextField textField = new JTextField(35);
+    JTextArea messageArea = new JTextArea(40, 50);
+    JButton sendText = new JButton("Send");
+    JButton sendFile = new JButton("+");
+    JButton logout = new JButton("Logout");
+
+    public Client() {
+        this.name = getName();
+        this.host = getHost();
+        this.port = getPort();
+
+        // testing
+        System.out.println("Name: " + name);
+        System.out.println("host: " + host);
+        System.out.println("port: " + port);
+
+        // connect to the server
+        connect(host, port);
+
+        textField.setEditable(true);
+        messageArea.setEditable(false);
+        panel.setPreferredSize(new Dimension(50, 50));
+        panel.setLayout(new FlowLayout());
+        panel.add(textField); panel.add(sendFile); panel.add(sendText);
+        frame.getContentPane().add(panel, BorderLayout.SOUTH);
+        frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
+        frame.getContentPane().add(logout, BorderLayout.NORTH);
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.pack();
+
+        sendText.addActionListener(event -> {
+            listenForMessages(textField.getText());
+            textField.setText("");
+        });
+
+        sendFile.addActionListener(event -> {
+            getFile();
+        });
+
+        logout.addActionListener(event -> {
+            // TODO: ask for logs then disconnect
+            disconnect();
+            System.exit(0);
+        });
     }
 
-    public Client(){
+    private String getName() {
+        return JOptionPane.showInputDialog(frame, "Username: ", "",
+                JOptionPane.PLAIN_MESSAGE);
+    }
 
-        String host;
-        int port;
+    private String getHost() {
+        return JOptionPane.showInputDialog(frame, "Host Address: ", "",
+                JOptionPane.PLAIN_MESSAGE);
+    }
 
+    private int getPort() {
+        return Integer.parseInt(JOptionPane.showInputDialog(frame, "Port Number: ", "",
+                JOptionPane.PLAIN_MESSAGE));
+    }
+
+    private void connect(String host, int port) {
         try {
-            
-            System.out.print("Name: "); name = sc.nextLine();
-            System.out.print("host: "); host = sc.nextLine();
-            System.out.print("port: "); port = sc.nextInt(); 
-            sc.nextLine(); //buffer
-
             Socket endpoint = new Socket(host, port);
             connection = new ClientConnection(endpoint, this);
             connection.start();
-            
-            listenForMessages();
-            
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void disconnect() {
+        try {
             connection.terminateConnection();
             sc.close();
             connection.close();
-            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void listenForMessages () {
-        String msg;
-        while (true) {
-            msg = sc.nextLine();
-            if (!(msg.equals("END"))) {
-                if (msg.equals("FILE")){
-                    getFile();
-                } else {
-                    sendMsg(msg);
-                }
-            } else break;
-        }
+    public void listenForMessages(String message) {
+        this.sendMsg(message);
     }
 
     //passes message to clientconnection
@@ -65,7 +114,6 @@ public class Client {
     //get file upload from client
     public void getFile() {
         try {
-
             System.out.println("Enter filename: ");
             String filename = sc.nextLine();
             File file = new File(filename);
@@ -78,7 +126,12 @@ public class Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+    }
+
+    // main method
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.frame.setVisible(true);
     }
 
 }
