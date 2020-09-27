@@ -1,7 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class ClientConnection extends Thread {
@@ -57,7 +55,6 @@ public class ClientConnection extends Thread {
 
             System.out.println("FILE: " + filename);
             String temp = filename.toString();
-            setFilename(temp);
 
             System.out.println("FILE (toString): " + this.filename);
 
@@ -90,7 +87,7 @@ public class ClientConnection extends Thread {
         String message="";
         try {
             type = "file";
-//            clientsmessage = true;
+            clientsmessage = true;
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
@@ -110,14 +107,9 @@ public class ClientConnection extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//            if (clientsmessage) {
-//                System.out.print("You ");
-//                message = "You sent a file\n\n";
-//            } else {
-                System.out.print(sender + " ");
-                message = sender + " sent a file.\n\n";
-//            }
-            System.out.println("sent a file.");
+
+            System.out.print(sender + " ");
+            message = sender + " sent a file.\n\n";
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,14 +131,9 @@ public class ClientConnection extends Thread {
         this.run = false;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
     public String getFilename() {
-        String message = "Rename file: " + this.filename;
-        return JOptionPane.showInputDialog(frame, message, "",
-                JOptionPane.PLAIN_MESSAGE);
+        String message = "Rename file: ";
+        return JOptionPane.showInputDialog(frame, message, "", JOptionPane.PLAIN_MESSAGE);
     }
 
     @Override

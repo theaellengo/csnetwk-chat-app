@@ -7,7 +7,8 @@
     ` run runServer `
 3. Run clients in separate cmd windows:
     ` run runClient `
-4. After selecting a file/an image, send a text message and send the message. The file/image will be sent afterwards.
+4. After selecting a file/an image, send a text message and 
+send the message. The file/image will be sent afterwards.
 ```
 
 ## Set up (MacOS)
@@ -17,5 +18,6 @@
     ` sh runServer.sh `
 3. Run clients in separate terminal windows:
     ` sh runClient.sh `
-4. After selecting a file/an image, send a text message and send the message. The file/image will be sent afterwards.
+4. After selecting a file/an image, send a text message and 
+send the message. The file/image will be sent afterwards.
 ```
