@@ -13,8 +13,6 @@ public class ClientConnection extends Thread {
     String type = "msg";
     Boolean clientsmessage = false;
     Boolean run = true;
-
-    BufferedImage img = null;
     
     public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
@@ -32,84 +30,6 @@ public class ClientConnection extends Thread {
         }
     }
 
-    public void sendFile(String file) {
-        try {
-            type = "file";
-            System.out.println("Retrieving image " + file + "...");
-            img = ImageIO.read(new File(file));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            ImageIO.write(img, "jpg", baos);
-            baos.flush();
-
-            byte[] bytes = baos.toByteArray();
-            baos.close();
-
-            System.out.println("Sending image to chatmate...");
-
-            OutputStream out = endpoint.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(out);
-
-            dos.writeInt(bytes.length);
-            dos.write(bytes, 0, bytes.length);
-
-            System.out.println("Image sent to chatmate!");
-
-            dos.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void receiveFile() {
-        try {
-            type = "file";
-            InputStream in = endpoint.getInputStream();
-            DataInputStream dis = new DataInputStream(in);
-
-            int len = dis.readInt();
-            System.out.println("Image size: " + (len/1024) + "KB");
-            sendFileToServer(len, dis);
-
-            byte[] data = new byte[len];
-            dis.readFully(data);
-
-            dis.close();
-
-            InputStream inputStream = new ByteArrayInputStream(data);
-            BufferedImage bufferedImage = ImageIO.read(inputStream);
-
-            client.receiveFile(bufferedImage);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void saveFile(File file) throws IOException {
-        try {
-            System.out.println("Downloading file...");
-            URL url = file.toURL();
-
-            InputStream inputStream = url.openStream();
-            OutputStream outputStream = new FileOutputStream(file.toString());
-            byte[] buffer = new byte[2048];
-
-            int length = 0;
-
-            while((length = inputStream.read(buffer)) != -1) {
-                System.out.println("Buffer Read of length: " + length);
-                outputStream.write(buffer, 0, length);
-            }
-
-            inputStream.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public String readFromServer(String sender, String msg) {
         String message = "";
         try {
@@ -119,51 +39,72 @@ public class ClientConnection extends Thread {
             else {
                 message = sender + ": " + msg + "\n\n";
             }
-//            clientsmessage = false; //set false after message has been received
+            clientsmessage = false; //set false after message has been received
         } catch (Exception e) {
             e.printStackTrace();
         }
         return message;
     }
 
-    public void sendFileToServer(int bytecount, DataInputStream dataInput) {
+    public void sendFileToServer(File filename) {
         try {
             type = "file";
             writer.writeUTF(type);
             clientsmessage = true;
-            byte[] allocbytes = new byte[bytecount];
-            writer.writeInt(bytecount);
-            dataInput.read(allocbytes, 0, allocbytes.length);
-            writer.write(allocbytes, 0, allocbytes.length);
+
+            FileInputStream fileInput = new FileInputStream(filename);
+            reader = new DataInputStream(fileInput);
+
+            int byteCount = fileInput.available();
+            byte[] buffer = new byte[byteCount];
+
+            reader.read(buffer, 0, buffer.length);
+
+            System.out.println("Sending file " + filename + " (" + filename.length() + " bytes)");
+
+            writer = new DataOutputStream(endpoint.getOutputStream());
+            writer.writeInt(buffer.length);
+            writer.write(buffer, 0, buffer.length);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void readFileFromServer(String sender){
+    public String readFileFromServer(String sender){
+        String message="";
         try {
             type = "file";
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
             try {
-                File filename = new File("RCVD.MD"); //have to change
+                reader = new DataInputStream(endpoint.getInputStream());
+
+                int fileLength = reader.readInt();
+                byte[] buffer = new byte[fileLength];
+                reader.read(buffer, 0, buffer.length);
+
+                File filename = new File("test.jpg");
                 FileOutputStream fileOutput = new FileOutputStream(filename);
-                fileOutput.write(allocbytes, 0, allocbytes.length);
-                fileOutput.close();
+                fileOutput.write(buffer, 0, buffer.length);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
             if (clientsmessage) {
                 System.out.print("You ");
+                message = "You sent a file";
             } else {
                 System.out.print(sender + " ");
+                message = sender + "sent a file.";
             }
             System.out.println("sent a file.");
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return message;
     }
 
     public void close() {
@@ -192,7 +133,7 @@ public class ClientConnection extends Thread {
                 try {
                     type = reader.readUTF(); //this comes from client, which is closed
                     if (type.equals("file")) {
-                        readFileFromServer(reader.readUTF());
+                        client.messageArea.append(readFileFromServer(reader.readUTF()));
                     } else {
                         client.messageArea.append(readFromServer(reader.readUTF(), reader.readUTF()));
                     }

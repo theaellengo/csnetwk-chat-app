@@ -19,9 +19,9 @@ public class Client {
     JFrame frame = new JFrame("De La Salle Usap");
     JPanel panel = new JPanel();
     JTextField textField = new JTextField(35);
-    JTextArea messageArea = new JTextArea(40, 50);
+    JTextArea messageArea = new JTextArea(40, 70);
     JButton sendText = new JButton("Send");
-    JButton sendFile = new JButton("+");
+    JButton sendFile = new JButton("Send File/Image");
     JButton logout = new JButton("Logout");
 
     public Client() {
@@ -49,6 +49,11 @@ public class Client {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
 
+        textField.addActionListener(event -> {
+            listenForMessages(textField.getText());
+            textField.setText("");
+        });
+
         sendText.addActionListener(event -> {
             listenForMessages(textField.getText());
             textField.setText("");
@@ -57,8 +62,8 @@ public class Client {
         sendFile.addActionListener(event -> {
             try {
                 JFileChooser chooseFile = new JFileChooser();
-                int c = chooseFile.showSaveDialog(frame);
-                getFile(chooseFile, c);
+                int c = chooseFile.showSaveDialog(null);
+//                getFile(chooseFile, c);
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
@@ -66,7 +71,6 @@ public class Client {
         });
 
         logout.addActionListener(event -> {
-            // TODO: ask for logs then disconnect
             disconnect();
             System.exit(0);
         });
@@ -126,17 +130,7 @@ public class Client {
         try {
             if (c == JFileChooser.APPROVE_OPTION) {
                 File file = chooseFile.getSelectedFile();
-                FileInputStream fileInput = new FileInputStream(file);
-                DataInputStream dataInput = new DataInputStream(fileInput);
-
-                String str_file = file.toString();
-                System.out.println(str_file); // testing
-
-                int byteCount = fileInput.available();
-                System.out.println("BYTECOUNT: " + byteCount);
-
-                connection.sendFile(str_file);
-//                connection.sendFileToServer(byteCount, dataInput);
+                connection.sendFileToServer(file);
             }
 
         } catch (Exception e) {
