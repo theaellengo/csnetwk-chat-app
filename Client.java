@@ -56,12 +56,12 @@ public class Client {
         sendFile.addActionListener(event -> {
             try {
                 JFileChooser chooseFile = new JFileChooser();
-                chooseFile.showSaveDialog(null);
+                int c = chooseFile.showSaveDialog(frame);
+                getFile(chooseFile, c);
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
             }
-
         });
 
         logout.addActionListener(event -> {
@@ -121,19 +121,21 @@ public class Client {
     }
 
     //get file upload from client
-    public void getFile() {
+    public void getFile(JFileChooser chooseFile, int c) {
         try {
-            System.out.println("Enter filename: ");
-            String filename = sc.nextLine();
-            File file = new File(filename);
+            if (c == JFileChooser.APPROVE_OPTION) {
+            File file = chooseFile.getSelectedFile();
             FileInputStream fileInput = new FileInputStream(file);
             DataInputStream dataInput = new DataInputStream(fileInput);
+            System.out.println(file);
 
             int bytecount = fileInput.available();
-            connection.sendFileToServer(bytecount, dataInput);
+            connection.sendFileToServer(bytecount, dataInput, file);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

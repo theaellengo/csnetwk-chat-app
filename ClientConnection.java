@@ -10,6 +10,7 @@ public class ClientConnection extends Thread {
     String type = "msg";
     Boolean clientsmessage = false;
     Boolean run = true;
+    File file;
     
     public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
@@ -27,8 +28,9 @@ public class ClientConnection extends Thread {
         }
     }
 
-    public void sendFileToServer(int bytecount, DataInputStream dataInput) {
+    public void sendFileToServer(int bytecount, DataInputStream dataInput, File file) {
         try {
+            this.file = file;
             type = "file";
             writer.writeUTF(type);
             clientsmessage = true;
@@ -63,7 +65,8 @@ public class ClientConnection extends Thread {
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
             try {
-                File filename = new File("RCVD.MD"); //have to change
+//                File filename = new File("RCVD.MD"); //have to change
+                File filename = this.file;
                 FileOutputStream fileOutput = new FileOutputStream(filename);
                 fileOutput.write(allocbytes, 0, allocbytes.length);
                 fileOutput.close();
@@ -71,11 +74,11 @@ public class ClientConnection extends Thread {
                 e.printStackTrace();
             }
             if (clientsmessage) {
-                System.out.print("You: ");
+                System.out.print("You ");
             } else {
-                System.out.print(sender + ": ");
+                System.out.print(sender + " ");
             }
-            System.out.println("sent a file");
+            System.out.println("sent a file: " + this.file);
             clientsmessage = false;
         } catch (Exception e) {
             e.printStackTrace();
