@@ -1,10 +1,18 @@
 # csnetwk-chat-app
 
-## Navigate to folder
+## Set up (Windows)
 ```
-Server
-1. run runServer
-  
-Client
-1. run runClient
+1. Navigate to folder.
+2. Run the server in cmd: 
+    ` run runServer `
+3. Run clients in separate cmd windows:
+    ` run runClient `
 ```
+
+## Set up (MacOS)
+```
+1. Navigate to folder.
+2. Run the server in the terminal: 
+    ` sh runServer.sh `
+3. Run clients in separate terminal windows:
+    ` sh runClient.sh `

@@ -13,6 +13,9 @@ public class ClientConnection extends Thread {
     String type = "msg";
     Boolean clientsmessage = false;
     Boolean run = true;
+
+    String filename;
+    JFrame frame = new JFrame("Rename file.");
     
     public ClientConnection(Socket endpoint, Client client) {
         this.endpoint = endpoint;
@@ -52,19 +55,28 @@ public class ClientConnection extends Thread {
             writer.writeUTF(type);
             clientsmessage = true;
 
+            System.out.println(filename);
+            this.filename = filename.toString();
+
             FileInputStream fileInput = new FileInputStream(filename);
             reader = new DataInputStream(fileInput);
 
             int byteCount = fileInput.available();
+            System.out.println("byteCount: " + byteCount);
+
             byte[] buffer = new byte[byteCount];
 
             reader.read(buffer, 0, buffer.length);
+
+            System.out.println(filename);
 
             System.out.println("Sending file " + filename + " (" + filename.length() + " bytes)");
 
             writer = new DataOutputStream(endpoint.getOutputStream());
             writer.writeInt(buffer.length);
             writer.write(buffer, 0, buffer.length);
+
+            clientsmessage = false;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +87,7 @@ public class ClientConnection extends Thread {
         String message="";
         try {
             type = "file";
+//            clientsmessage = true;
             int bytesize = reader.readInt();
             byte[] allocbytes = new byte[bytesize];
             reader.read(allocbytes, 0, allocbytes.length);
@@ -85,20 +98,22 @@ public class ClientConnection extends Thread {
                 byte[] buffer = new byte[fileLength];
                 reader.read(buffer, 0, buffer.length);
 
-                File filename = new File("test.jpg");
+                String file = getFilename();
+
+                File filename = new File(file);
                 FileOutputStream fileOutput = new FileOutputStream(filename);
                 fileOutput.write(buffer, 0, buffer.length);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (clientsmessage) {
-                System.out.print("You ");
-                message = "You sent a file";
-            } else {
+//            if (clientsmessage) {
+//                System.out.print("You ");
+//                message = "You sent a file\n\n";
+//            } else {
                 System.out.print(sender + " ");
-                message = sender + "sent a file.";
-            }
+                message = sender + " sent a file.\n\n";
+//            }
             System.out.println("sent a file.");
             clientsmessage = false;
         } catch (Exception e) {
@@ -119,6 +134,11 @@ public class ClientConnection extends Thread {
 
     public void terminateConnection() {
         this.run = false;
+    }
+
+    public String getFilename() {
+        return JOptionPane.showInputDialog(frame, "Rename file: " + this.filename, "",
+                JOptionPane.PLAIN_MESSAGE);
     }
 
     @Override

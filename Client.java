@@ -63,7 +63,7 @@ public class Client {
             try {
                 JFileChooser chooseFile = new JFileChooser();
                 int c = chooseFile.showSaveDialog(null);
-//                getFile(chooseFile, c);
+                getFile(chooseFile, c);
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
@@ -130,6 +130,7 @@ public class Client {
         try {
             if (c == JFileChooser.APPROVE_OPTION) {
                 File file = chooseFile.getSelectedFile();
+                System.out.println("getFile(): " + file);
                 connection.sendFileToServer(file);
             }
 
@@ -137,17 +138,6 @@ public class Client {
             e.printStackTrace();
             JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    public void receiveFile(BufferedImage bufferedImage) {
-        JFrame frame = new JFrame("Sent Image");
-        ImageIcon icon = new ImageIcon(bufferedImage);
-        JLabel label = new JLabel();
-
-        label.setIcon(icon);
-        frame.add(label);
-        frame.pack();
-        frame.setVisible(true);
     }
 
     // main method
