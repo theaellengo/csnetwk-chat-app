@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -124,19 +125,35 @@ public class Client {
     public void getFile(JFileChooser chooseFile, int c) {
         try {
             if (c == JFileChooser.APPROVE_OPTION) {
-            File file = chooseFile.getSelectedFile();
-            FileInputStream fileInput = new FileInputStream(file);
-            DataInputStream dataInput = new DataInputStream(fileInput);
-            System.out.println(file);
+                File file = chooseFile.getSelectedFile();
+                FileInputStream fileInput = new FileInputStream(file);
+                DataInputStream dataInput = new DataInputStream(fileInput);
 
-            int bytecount = fileInput.available();
-            connection.sendFileToServer(bytecount, dataInput, file);
+                String str_file = file.toString();
+                System.out.println(str_file); // testing
+
+                int byteCount = fileInput.available();
+                System.out.println("BYTECOUNT: " + byteCount);
+
+                connection.sendFile(str_file);
+//                connection.sendFileToServer(byteCount, dataInput);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void receiveFile(BufferedImage bufferedImage) {
+        JFrame frame = new JFrame("Sent Image");
+        ImageIcon icon = new ImageIcon(bufferedImage);
+        JLabel label = new JLabel();
+
+        label.setIcon(icon);
+        frame.add(label);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     // main method
