@@ -14,7 +14,6 @@ public class Client {
     String host;
     int port;
 
-
     // main chat area
     JFrame frame = new JFrame("De La Salle Usap");
     JPanel panel = new JPanel();
@@ -55,7 +54,14 @@ public class Client {
         });
 
         sendFile.addActionListener(event -> {
-            getFile();
+            try {
+                JFileChooser chooseFile = new JFileChooser();
+                chooseFile.showSaveDialog(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         });
 
         logout.addActionListener(event -> {

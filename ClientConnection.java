@@ -44,14 +44,12 @@ public class ClientConnection extends Thread {
     public String readFromServer(String sender, String msg) {
         String message = "";
         try {
-            if (clientsmessage) {
+            if(clientsmessage) {
                 message = "You: " + msg + "\n\n";
-                System.out.println(message);
-            } else {
-                message = sender + ": " + msg + "\n\n";
-                System.out.println(message);
             }
-//            System.out.println(msg);
+            else {
+                message = sender + ": " + msg + "\n\n";
+            }
             clientsmessage = false; //set false after message has been received
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +110,6 @@ public class ClientConnection extends Thread {
                     if (type.equals("file")) {
                         readFileFromServer(reader.readUTF());
                     } else {
-//                        readFromServer(reader.readUTF(), reader.readUTF());
                         client.messageArea.append(readFromServer(reader.readUTF(), reader.readUTF()));
                     }
                 } catch (Exception e) {
